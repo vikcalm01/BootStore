@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: "Times New Roman", Times, serif;
-  background: #FFFFFF;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: #f6f8fb;
   color: #222;
 }
 .container {
@@ -10,8 +10,8 @@ body {
   padding: 16px;
 }
 .topbar {
-  background: #7FFF00;
-  color: #111;
+  background: linear-gradient(90deg, #3da35d, #5bc0be);
+  color: #fff;
 }
 .row {
   display: flex;
@@ -22,8 +22,8 @@ body {
 .wrap { flex-wrap: wrap; }
 .card {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(29, 46, 66, 0.08);
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -44,11 +44,11 @@ input, select, button, .btn {
   text-decoration: none;
 }
 button, .btn {
-  background: #00FA9A;
-  color: #111;
+  background: #2a9d8f;
+  color: #fff;
   cursor: pointer;
 }
-.secondary { background: #7FFF00; color: #111; }
+.secondary { background: #8ecae6; color: #123; }
 .danger { background: #a22727; color: #fff; }
 .table-wrap { overflow-x: auto; }
 table {
@@ -61,7 +61,7 @@ th, td {
   padding: 8px;
   font-size: 14px;
 }
-th { background: #eef2ff; text-align: left; }
+th { background: #e9f3ff; text-align: left; }
 .old-price {
   color: #cc2020;
   text-decoration: line-through;
@@ -77,10 +77,12 @@ th { background: #eef2ff; text-align: left; }
 .msg.info { background: #e0f4ff; }
 .inline { display: inline; }
 nav a {
-  color: #111;
+  color: #fff;
   margin-left: 12px;
   text-decoration: none;
 }
+nav a:hover { text-decoration: underline; }
+.muted { color: #4d6078; }
 .product-image {
   width: 72px;
   height: 48px;
