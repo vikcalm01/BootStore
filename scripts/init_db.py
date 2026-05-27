@@ -112,6 +112,20 @@ def read_xlsx(path: Path) -> pd.DataFrame:
     return pd.read_excel(path, header=0)
 
 
+def pick_import_file(import_dir: Path, include_keyword: str, exclude_keywords: tuple[str, ...] = ()) -> Path:
+    include = include_keyword.casefold()
+    excluded = tuple(word.casefold() for word in exclude_keywords)
+    candidates = sorted(import_dir.glob("*.xlsx"))
+    for file_path in candidates:
+        name = file_path.name.casefold()
+        if include not in name:
+            continue
+        if any(word in name for word in excluded):
+            continue
+        return file_path
+    raise FileNotFoundError(f"Не найден файл импорта по ключу: {include_keyword}")
+
+
 def get_col(row: pd.Series, idx: int, default: Any = "") -> Any:
     if idx >= len(row.index):
         return default
@@ -131,11 +145,13 @@ def build_db() -> None:
         if image_file.suffix.lower() in (".jpg", ".jpeg", ".png", ".ico"):
             (ASSETS_DIR / image_file.name).write_bytes(image_file.read_bytes())
 
-    product_file = next(import_dir.glob("*Tovar*.xlsx"))
-    user_file = next(import_dir.glob("*user_import*.xlsx"))
-    order_file = next(import_dir.glob("*заказ*_import.xlsx"), None)
-    if order_file is None:
-        order_file = next(import_dir.glob("*_import.xlsx"))
+    product_file = pick_import_file(import_dir, "tovar")
+    user_file = pick_import_file(import_dir, "user_import")
+    order_file = pick_import_file(
+        import_dir,
+        "заказ",
+        exclude_keywords=("user", "tovar", "пункт", "выдач"),
+    )
     pickup_file = next(import_dir.glob("*пункт*выдач*_import.xlsx"), None)
 
     conn = sqlite3.connect(DB_PATH)
@@ -249,6 +265,12 @@ def build_db() -> None:
         client_name = str(get_col(row, 5))
         receive_code = str(get_col(row, 6))
         status = str(get_col(row, 7))
+        pickup_exists = cur.execute(
+            "SELECT 1 FROM pickup_points WHERE id = ?",
+            (pickup_id,),
+        ).fetchone()
+        if pickup_exists is None:
+            pickup_id = 1
 
         cur.execute(
             """

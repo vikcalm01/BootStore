@@ -21,6 +21,7 @@ from flask import (
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "app.db"
 ASSETS_DIR = ROOT / "assets"
+DEFAULT_IMAGE = "picture.png"
 
 app = Flask(
     __name__,
@@ -83,12 +84,8 @@ def admin_page():
     return redirect(url_for("products"))
 
 
-@app.get("/manager/admin")
-@role_required("manager", "admin")
-def manager_admin_page():
-    if session.get("role") == "admin":
-        return redirect(url_for("admin_page"))
-    return redirect(url_for("manager_page"))
+def _normalize_image(image_path: str | None) -> str:
+    return Path(str(image_path)).name if image_path else DEFAULT_IMAGE
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -177,11 +174,7 @@ def products():
     normalized_rows = []
     for row in rows:
         item = dict(row)
-        raw_image_path = item.get("image_path")
-        if raw_image_path:
-            item["image_file"] = Path(str(raw_image_path)).name
-        else:
-            item["image_file"] = "picture.png"
+        item["image_file"] = _normalize_image(item.get("image_path"))
         normalized_rows.append(item)
     suppliers = get_db().execute(
         "SELECT supplier_name FROM suppliers ORDER BY supplier_name"
